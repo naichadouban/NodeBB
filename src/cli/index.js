@@ -14,10 +14,10 @@ try {
 } catch (e) {
 	if (e.code === 'ENOENT') {
 		console.warn('package.json not found.');
-		console.log('Populating package.json...');
+		console.log('Populating package.json...');  // populating 填充
 
 		packageInstall.updatePackageFile();
-		packageInstall.preserveExtraneousPlugins();
+		packageInstall.preserveExtraneousPlugins(); // prserve：保留  Extraneous：外来
 
 		try {
 			fs.accessSync(path.join(dirname, 'node_modules/colors/package.json'), fs.constants.R_OK);

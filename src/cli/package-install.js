@@ -7,7 +7,8 @@ var cproc = require('child_process');
 var packageFilePath = path.join(__dirname, '../../package.json');
 var packageDefaultFilePath = path.join(__dirname, '../../install/package.json');
 var modulesPath = path.join(__dirname, '../../node_modules');
-
+// 把install目录下的package.json的内容追加到根目录下的package.json
+// 应为初始状态根目录的package.json是空的，所以第一次调用的话就相当于是文件的复制了
 function updatePackageFile() {
 	var oldPackageContents = {};
 
@@ -62,7 +63,7 @@ function preserveExtraneousPlugins() {
 	try {
 		fs.accessSync(modulesPath, fs.constants.R_OK);
 	} catch (e) {
-		return;
+		return;  // 根目录下没有node_mudules目录的话，直接返回
 	}
 
 	var isPackage = /^nodebb-(plugin|theme|widget|reward)-\w+/;
