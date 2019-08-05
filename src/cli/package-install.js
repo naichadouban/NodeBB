@@ -43,9 +43,10 @@ function installAll() {
 		// ignore
 	}
 	try {
+		// 但该方法在子进程完全关闭之前不会返回
 		cproc.execSync(command + (prod ? ' --production' : ''), {
-			cwd: path.join(__dirname, '../../'),
-			stdio: [0, 1, 2],
+			cwd: path.join(__dirname, '../../'),  // cwd 子进程当前的工作工作目录
+			stdio: [0, 1, 2], //stdio 子进程的 stdio 配置。默认情况下，除非指定了 stdio，否则 stderr 将会被输出到父进程的 stderr
 		});
 	} catch (e) {
 		console.log('Error installing dependencies!');

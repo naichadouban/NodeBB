@@ -4,9 +4,11 @@ var winston = require('winston');
 var async = require('async');
 var path = require('path');
 var nconf = require('nconf');
-
+// 此处就调用install包下面的安装程序了
 var install = require('../../install/web').install;
 
+// 这里感觉就是应用的配置了
+// install的web界面，点击install NodeBB时也是跳转到这里
 function setup(initConfig) {
 	var paths = require('./paths');
 	var install = require('../install');

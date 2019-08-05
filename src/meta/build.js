@@ -134,6 +134,7 @@ function buildTargets(targets, parallel, callback) {
 	}, callback);
 }
 
+// 这里编译全部的静态文件
 function build(targets, options, callback) {
 	if (!callback && typeof options === 'function') {
 		callback = options;

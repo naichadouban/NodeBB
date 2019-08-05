@@ -134,7 +134,7 @@ function forkWorker(index, isPrimary) {
 	process.env.port = ports[index];
 
 	var worker = fork(appPath, args, {
-		silent: silent,
+		silent: silent,  // slient 无声
 		env: process.env,
 	});
 

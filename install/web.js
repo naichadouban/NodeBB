@@ -10,7 +10,7 @@ var less = require('less');
 var async = require('async');
 var uglify = require('uglify-es');
 var nconf = require('nconf');
-var Benchpress = require('benchpressjs');
+var Benchpress = require('benchpressjs');  // 就是很小的js 模版引擎
 
 var app = express();
 var server;
@@ -18,7 +18,7 @@ var server;
 var formats = [
 	winston.format.colorize(),
 ];
-
+// 自定义格式
 const timestampFormat = winston.format((info) => {
 	var dateString = new Date().toISOString() + ' [' + global.process.pid + ']';
 	info.level = dateString + ' - ' + info.level;
@@ -30,7 +30,7 @@ formats.push(winston.format.simple());
 
 winston.configure({
 	level: 'verbose',
-	format: winston.format.combine.apply(null, formats),
+	format: winston.format.combine.apply(null, formats), // 那这个日志对象，就会把上面我们定义的几种格式都包含进去
 	transports: [
 		new winston.transports.Console({
 			handleExceptions: true,
@@ -42,15 +42,15 @@ winston.configure({
 	],
 });
 
-var web = module.exports;
+var web = module.exports;  // web现在就是module.exports指向的内存区域
 
 var scripts = [
 	'node_modules/jquery/dist/jquery.js',
-	'public/vendor/xregexp/xregexp.js',
+	'public/vendor/xregexp/xregexp.js', //JavaScript Regex
 	'public/vendor/xregexp/unicode/unicode-base.js',
 	'public/src/utils.js',
 	'public/src/installer/install.js',
-	'node_modules/zxcvbn/dist/zxcvbn.js',
+	'node_modules/zxcvbn/dist/zxcvbn.js', //密码复杂度相关，各种语言（golang）都有相应的包
 ];
 
 var installing = false;
@@ -61,9 +61,9 @@ var launchUrl;
 web.install = function (port) {
 	port = port || 4567;
 	winston.info('Launching web installer on port ' + port);
-
+	// express.static 相当于express的一个中间件，提供静态文件的
 	app.use(express.static('public', {}));
-	app.engine('tpl', function (filepath, options, callback) {
+	app.engine('tpl', function (filepath, options, callback) { // 这相当于自定义express的扩展引擎
 		async.waterfall([
 			function (next) {
 				fs.readFile(filepath, 'utf-8', next);
@@ -73,9 +73,14 @@ web.install = function (port) {
 			},
 		], callback);
 	});
+	// 在express可以呈现模版前，必须设置以下应用程序
+	// 1。views：模板文件所在目录。例如：app.set('views', './views')
+	// 2。view engine：要使用的模板引擎。例如：app.set('view engine', 'pug')
 	app.set('view engine', 'tpl');
 	app.set('views', path.join(__dirname, '../src/views'));
-	app.use(bodyParser.urlencoded({
+	app.use(bodyParser.urlencoded({ // 解析 application/x-www-form-urlencoded
+		// extended - 当设置为false时，会使用querystring库解析URL编码的数据；
+		// 当设置为true时，会使用qs库解析URL编码的数据。后没有指定编码时，使用此编码。默认为true
 		extended: true,
 	}));
 
@@ -145,6 +150,8 @@ function install(req, res) {
 	installing = true;
 	var setupEnvVars = nconf.get();
 	for (var i in req.body) {
+		// hasOwnProperty() 	决定某个对象是否有某个属性？
+		// install请求中，setupEnvVars没有的属性给添加上
 		if (req.body.hasOwnProperty(i) && !process.env.hasOwnProperty(i)) {
 			setupEnvVars[i.replace(':', '__')] = req.body[i];
 		}
@@ -221,7 +228,7 @@ function launch(req, res) {
 		process.exit(0);
 	});
 }
-
+// 把public/less/install.less编译成public/installer.css
 function compileLess(callback) {
 	fs.readFile(path.join(__dirname, '../public/less/install.less'), function (err, style) {
 		if (err) {
@@ -237,7 +244,7 @@ function compileLess(callback) {
 		});
 	});
 }
-
+// 把几个js文件编译成一个
 function compileJS(callback) {
 	var code = '';
 	async.eachSeries(scripts, function (srcPath, next) {
@@ -254,6 +261,7 @@ function compileJS(callback) {
 			return callback(err);
 		}
 		try {
+			// UglifyJS is a JavaScript parser, minifier, compressor and beautifier toolkit.
 			var minified = uglify.minify(code, {
 				compress: false,
 			});
@@ -266,7 +274,7 @@ function compileJS(callback) {
 		}
 	});
 }
-
+// 把node_modules下的bootstrap样式文件，拷贝到public目录下
 function copyCSS(next) {
 	async.waterfall([
 		function (next) {

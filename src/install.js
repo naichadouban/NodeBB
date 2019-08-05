@@ -128,14 +128,16 @@ function setupConfig(next) {
 
 	async.waterfall([
 		function (next) {
+		// 数据库使用提供
 			if (install.values) {
 				// Use provided values, fall back to defaults
 				var config = {};
 				var redisQuestions = require('./database/redis').questions;
 				var mongoQuestions = require('./database/mongo').questions;
 				var postgresQuestions = require('./database/postgres').questions;
+				// 合并下
 				var allQuestions = questions.main.concat(questions.optional).concat(redisQuestions).concat(mongoQuestions).concat(postgresQuestions);
-
+				// 把提供的参数值复制给allQuestions中的每一项，如果没有提供那就使用默认值
 				allQuestions.forEach(function (question) {
 					if (install.values.hasOwnProperty(question.name)) {
 						config[question.name] = install.values[question.name];
@@ -556,7 +558,7 @@ function setCopyrightWidget(next) {
 install.setup = function (callback) {
 	async.series([
 		checkSetupFlag,
-		checkCIFlag,
+		checkCIFlag,  // CICD的，暂时先不用管
 		setupConfig,
 		setupDefaultConfigs,
 		enableDefaultTheme,

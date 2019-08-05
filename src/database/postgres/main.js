@@ -8,7 +8,7 @@ module.exports = function (db, module) {
 	module.flushdb = async function () {
 		await query(`DROP SCHEMA "public" CASCADE`);
 		await query(`CREATE SCHEMA "public"`);
-	};
+};
 
 	module.emptydb = async function () {
 		await query(`DELETE FROM "legacy_object"`);

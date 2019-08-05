@@ -19,6 +19,7 @@ try {
 		packageInstall.updatePackageFile();
 		packageInstall.preserveExtraneousPlugins(); // prserve：保留  Extraneous：外来
 
+		// 有colors包就打印绿色的OK，没有的话，普通打印就可以
 		try {
 			fs.accessSync(path.join(dirname, 'node_modules/colors/package.json'), fs.constants.R_OK);
 
@@ -32,6 +33,7 @@ try {
 	}
 }
 
+// semver : 是版本控制的
 try {
 	fs.accessSync(path.join(dirname, 'node_modules/semver/package.json'), fs.constants.R_OK);
 
@@ -46,7 +48,7 @@ try {
 			throw e;
 		}
 	};
-
+	// 检查版本信息
 	checkVersion('nconf');
 	checkVersion('async');
 	checkVersion('commander');
@@ -57,6 +59,7 @@ try {
 		console.log('Installing them now...\n');
 
 		packageInstall.updatePackageFile();
+		// 把install目录下的package.json文件复制到根目录后，npm install安装所有的文件
 		packageInstall.installAll();
 
 		require('colors');
@@ -95,16 +98,20 @@ var env = program.dev ? 'development' : (process.env.NODE_ENV || 'production');
 process.env.NODE_ENV = env;
 global.env = env;
 
+// winston:日志系统
 prestart.setupWinston();
 
-// Alternate configuration file support
-var	configFile = path.resolve(dirname, program.config);
+// Alternate（备用） configuration file support
+var	configFile = path.resolve(dirname, program.config); // program.config 此时是config.json
 var configExists = file.existsSync(configFile) || (nconf.get('url') && nconf.get('secret') && nconf.get('database'));
-
+// loadConfig 也是会把一些变量赋值给nconf
+// 比如theme_path,core_templates_path,base_templaes_path等，都是在这里设置的
 prestart.loadConfig(configFile);
+// 此时的versionCheck主要是检查nodejs的版本
 prestart.versionCheck();
-
+// 感觉第一次运行的时候，这个条件铁定满足
 if (!configExists && process.argv[2] !== 'setup') {
+	// 说明应用还没有安装，那就先安装应用
 	require('./setup').webInstall();
 	return;
 }
