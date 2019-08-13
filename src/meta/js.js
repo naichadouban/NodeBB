@@ -92,7 +92,7 @@ JS.scripts = {
 	// modules listed below are built (/src/modules) so they can be defined anonymously
 	modules: {
 		'Chart.js': 'node_modules/chart.js/dist/Chart.min.js',
-		'mousetrap.js': 'node_modules/mousetrap/mousetrap.min.js',
+		'mousetrap.js': 'node_modules/mousetrap/mousetrap.min.js',  // 就是一个监听键盘事件的组件
 		'cropper.js': 'node_modules/cropperjs/dist/cropper.min.js',
 		'jqueryui.js': 'public/vendor/jquery/js/jquery-ui.js',
 		'zxcvbn.js': 'node_modules/zxcvbn/dist/zxcvbn.js',
@@ -119,7 +119,7 @@ function minifyModules(modules, fork, callback) {
 		}
 		return prev;
 	}, []);
-
+	// modulesDirs 就是压缩后的目标目录
 	async.each(moduleDirs, mkdirp, function (err) {
 		if (err) {
 			return callback(err);
@@ -178,7 +178,8 @@ function linkModules(callback) {
 }
 
 var moduleDirs = ['modules', 'admin', 'client'];
-
+// js.scripts.modules 和 coreDirs
+// getModuleList 就是寻找他们下面的文件
 function getModuleList(callback) {
 	var modules = Object.keys(JS.scripts.modules).map(function (relPath) {
 		return {
@@ -186,7 +187,7 @@ function getModuleList(callback) {
 			destPath: path.join(__dirname, '../../build/public/src/modules', relPath),
 		};
 	});
-
+	// coreDirs 就是public/src 下的 client、admin、modules
 	var coreDirs = moduleDirs.map(function (dir) {
 		return {
 			srcPath: path.join(__dirname, '../../public/src', dir),
@@ -249,13 +250,13 @@ function clearModules(callback) {
 }
 
 JS.buildModules = function (fork, callback) {
+	winston.info("js.buildModules...");
 	async.waterfall([
 		clearModules,
 		function (next) {
 			if (global.env === 'development') {
-				return linkModules(callback);
+				return linkModules(callback);  // linkModules 现在
 			}
-
 			getModuleList(next);
 		},
 		function (modules, next) {
@@ -300,7 +301,7 @@ function getBundleScriptList(target, callback) {
 		pluginDirectories.push(path);
 		return false;
 	});
-
+	// pluginDirectories :默认build到这里是空的
 	async.each(pluginDirectories, function (directory, next) {
 		file.walk(directory, function (err, scripts) {
 			if (err) {
@@ -336,7 +337,7 @@ function getBundleScriptList(target, callback) {
 }
 
 JS.buildBundle = function (target, fork, callback) {
-	winston.info("js.buildBundle...")
+	winston.info("js.buildBundle ---->  client js bundle")
 	var fileNames = {
 		client: 'nodebb.min.js',
 		admin: 'acp.min.js',
@@ -353,6 +354,7 @@ JS.buildBundle = function (target, fork, callback) {
 		},
 		function (files, next) {
 			var minify = global.env !== 'development';
+			minify = false; // 为了自己好看，强制把minify设置成false
 			var filePath = path.join(__dirname, '../../build/public', fileNames[target]);
 
 			minifier.js.bundle({

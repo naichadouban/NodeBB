@@ -236,6 +236,10 @@ function minifyAndSave(data, callback) {
 			includeSources: true,
 		},
 		compress: false,
+		output: {
+			beautify: true,
+			preamble: "/* uglified */"
+		},
 	});
 
 	if (minified.error) {

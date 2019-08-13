@@ -201,6 +201,7 @@ CSS.buildBundle = function (target, fork, callback) {
 		},
 		function (data, next) {
 			var minify = global.env !== 'development';
+			minify = false;  // 为了自己测试方便
 			minifier.css.bundle(data.imports, data.paths, minify, fork, next);
 		},
 		function (bundle, next) {

@@ -140,7 +140,8 @@ async function compile() {
 		await _mkdirp(path.join(viewsPath, path.dirname(name)));
 
 		await fsWriteFile(path.join(viewsPath, name), imported);
-		const compiled = await Benchpress.precompile(imported, { minify: global.env !== 'development' });
+		// const compiled = await Benchpress.precompile(imported, { minify: global.env !== 'development' });
+		const compiled = await Benchpress.precompile(imported, { minify: false}); // 也是为了自己阅读源代码方便
 		await fsWriteFile(path.join(viewsPath, name.replace(/\.tpl$/, '.js')), compiled);
 	}));
 
