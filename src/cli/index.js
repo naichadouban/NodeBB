@@ -204,6 +204,7 @@ program
 	.on('--help', function () {
 		require('./manage').buildTargets();
 	});
+
 program
 	.command('activate [plugin]')
 	.description('Activate a plugin for the next startup of NodeBB (nodebb-plugin- prefix is optional)')

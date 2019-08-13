@@ -84,7 +84,7 @@ module.exports = function (Plugins) {
 			sounds: ['soundpack'],
 			languages: ['languageData'],
 		};
-
+		// fields是数组，就是上面map中的值，[staticDirs,modules,clientScripts,acpScript...]
 		const fields = _.uniq(_.flatMap(targets, target => map[target] || []));
 
 		// clear old data before build

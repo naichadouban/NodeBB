@@ -14,9 +14,9 @@ module.exports = function (config, callback) {
 	async.waterfall([
 		function (next) {
 			winston.info('\nNow configuring ' + config.database + ' database:');
-			getDatabaseConfig(config, next);
+			getDatabaseConfig(config, next);  // 获取自己需要的数据库配置项
 		},
-		function (databaseConfig, next) {
+		function (databaseConfig, next) { // 这里的databaseConfig还是三种数据库的配置项
 			saveDatabaseConfig(config, databaseConfig, next);
 		},
 	], callback);
@@ -92,6 +92,6 @@ function saveDatabaseConfig(config, databaseConfig, callback) {
 	for (var x = 0; x < allQuestions.length; x += 1) {
 		delete config[allQuestions[x].name];
 	}
-
+	// 到这里config只剩下postgres的配置项了
 	callback(null, config);
 }

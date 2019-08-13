@@ -9,6 +9,7 @@ var rimraf = require('rimraf');
 var file = require('../file');
 var plugins = require('../plugins');
 var minifier = require('./minifier');
+var winston = require('winston');
 
 var JS = module.exports;
 
@@ -235,9 +236,9 @@ function getModuleList(callback) {
 		callback(err, moduleFiles);
 	});
 }
-
+// 删除 D:\workspace\NodeBB\build\public\src\modules\ 下的 admin  client modules
 function clearModules(callback) {
-	var builtPaths = moduleDirs.map(function (p) {
+	var builtPaths = moduleDirs.map(function (p) { // D:\workspace\NodeBB\build\public\src\modules 下面的三个文件 admin、client、modules
 		return path.join(__dirname, '../../build/public/src', p);
 	});
 	async.each(builtPaths, function (builtPath, next) {
@@ -264,11 +265,12 @@ JS.buildModules = function (fork, callback) {
 };
 
 JS.linkStatics = function (callback) {
+	winston.info("js.linkStatics...")
 	rimraf(path.join(__dirname, '../../build/public/plugins'), function (err) {
 		if (err) {
 			return callback(err);
 		}
-		async.each(Object.keys(plugins.staticDirs), function (mappedPath, next) {
+		async.each(Object.keys(plugins.staticDirs), function (mappedPath, next) { // plugins.staticDirs 现在是空
 			var sourceDir = plugins.staticDirs[mappedPath];
 			var destDir = path.join(__dirname, '../../build/public/plugins', mappedPath);
 
@@ -284,6 +286,7 @@ JS.linkStatics = function (callback) {
 };
 
 function getBundleScriptList(target, callback) {
+
 	var pluginDirectories = [];
 
 	if (target === 'admin') {
@@ -333,6 +336,7 @@ function getBundleScriptList(target, callback) {
 }
 
 JS.buildBundle = function (target, fork, callback) {
+	winston.info("js.buildBundle...")
 	var fileNames = {
 		client: 'nodebb.min.js',
 		admin: 'acp.min.js',

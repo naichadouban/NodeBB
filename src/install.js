@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var url = require('url');
 var path = require('path');
-var prompt = require('prompt');
+var prompt = require('prompt');  // prompt:提示用户输入的包
 var winston = require('winston');
 var nconf = require('nconf');
 var _ = require('lodash');
@@ -46,13 +46,13 @@ questions.optional = [
 		default: nconf.get('port') || 4567,
 	},
 ];
-
+// 就是判断了下setup的参数，就发现往install.values中添加了database->postgres
 function checkSetupFlag(next) {
 	var setupVal = install.values;
 
 	try {
 		if (nconf.get('setup')) {
-			setupVal = JSON.parse(nconf.get('setup'));
+			setupVal = JSON.parse(nconf.get('setup')); // setupVal true
 		}
 	} catch (err) {}
 
@@ -79,7 +79,7 @@ function checkSetupFlag(next) {
 		}
 	} else if (nconf.get('database')) {
 		install.values = install.values || {};
-		install.values.database = nconf.get('database');
+		install.values.database = nconf.get('database');  // install.values只有database，postgres
 		next();
 	} else {
 		next();
@@ -91,7 +91,7 @@ function checkCIFlag(next) {
 	try {
 		ciVals = JSON.parse(nconf.get('ci'));
 	} catch (e) {
-		ciVals = undefined;
+		ciVals = undefined; // 走到这里了，undefined
 	}
 
 	if (ciVals && ciVals instanceof Object) {
@@ -123,19 +123,19 @@ function setupConfig(next) {
 	// prompt prepends "prompt: " to questions, let's clear that.
 	prompt.start();
 	prompt.message = '';
-	prompt.delimiter = '';
+	prompt.delimiter = ''; // delimiter ：分隔符
 	prompt.colors = false;
 
 	async.waterfall([
 		function (next) {
-		// 数据库使用提供
+			// 数据库使用提供
 			if (install.values) {
 				// Use provided values, fall back to defaults
 				var config = {};
 				var redisQuestions = require('./database/redis').questions;
 				var mongoQuestions = require('./database/mongo').questions;
 				var postgresQuestions = require('./database/postgres').questions;
-				// 合并下
+				// 合并下,question就相当于是数据库的配置项，现在把三个数据库需要的配置项合并了
 				var allQuestions = questions.main.concat(questions.optional).concat(redisQuestions).concat(mongoQuestions).concat(postgresQuestions);
 				// 把提供的参数值复制给allQuestions中的每一项，如果没有提供那就使用默认值
 				allQuestions.forEach(function (question) {
@@ -147,16 +147,16 @@ function setupConfig(next) {
 						config[question.name] = undefined;
 					}
 				});
-				setImmediate(next, null, config);
+				setImmediate(next, null, config);  // config就是我们在表单中填写的数据
 			} else {
 				prompt.get(questions.main, next);
 			}
 		},
 		function (config, next) {
-			configureDatabases(config, next);
+			configureDatabases(config, next);  // 这里就是把无关的数据配置都去掉了，只留下pg的配置
 		},
 		function (config, next) {
-			completeConfigSetup(config, next);
+			completeConfigSetup(config, next);  // 前面都是准备配置项，这里完成数据库初始化
 		},
 	], next);
 }
@@ -179,7 +179,7 @@ function completeConfigSetup(config, next) {
 	nconf.overrides(config);
 	async.waterfall([
 		function (next) {
-			require('./database').init(next);
+			require('./database').init(next); // 感觉就是对db对象配置一些函数
 		},
 		function (next) {
 			require('./database').createIndices(next);
@@ -557,9 +557,9 @@ function setCopyrightWidget(next) {
 
 install.setup = function (callback) {
 	async.series([
-		checkSetupFlag,
+		checkSetupFlag, // 就是设置了一个database->postgres
 		checkCIFlag,  // CICD的，暂时先不用管
-		setupConfig,
+		setupConfig,  // 在这里会完成数据库初始化
 		setupDefaultConfigs,
 		enableDefaultTheme,
 		createCategories,

@@ -123,7 +123,10 @@ var allTargets = Object.keys(targetHandlers).filter(function (name) {
 	return typeof targetHandlers[name] === 'function';
 });
 function buildTargets(targets, parallel, callback) {
+
+	parallel = false;
 	var all = parallel ? async.each : async.eachSeries;
+
 
 	var length = Math.max.apply(Math, targets.map(function (name) {
 		return name.length;
@@ -212,7 +215,7 @@ function build(targets, options, callback) {
 			}
 
 			startTime = Date.now();
-			buildTargets(targets, parallel, next);
+			buildTargets(targets, false, next);
 		},
 		function (next) {
 			totalTime = (Date.now() - startTime) / 1000;

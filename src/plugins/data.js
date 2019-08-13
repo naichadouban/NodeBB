@@ -68,7 +68,7 @@ function parseLicense(packageData) {
 }
 
 Data.getActive = async function () {
-	const pluginPaths = await Data.getPluginPaths();
+	const pluginPaths = await Data.getPluginPaths(); // pluginPaths 是0
 	return await Promise.all(pluginPaths.map(p => Data.loadPluginInfo(p)));
 };
 

@@ -70,7 +70,7 @@ postgresModule.init = function (callback) {
 
 	var Pool = require('pg').Pool;
 
-	var connOptions = postgresModule.getConnectionOptions();
+	var connOptions = postgresModule.getConnectionOptions();  // connOptions就是
 
 	const db = new Pool(connOptions);
 
